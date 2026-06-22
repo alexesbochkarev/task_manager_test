@@ -1,7 +1,11 @@
 from fastapi import FastAPI
+from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import settings
+from app.db.session import engine
 
 
 app = FastAPI(
@@ -20,4 +24,20 @@ app.add_middleware(
 
 @app.get("/health", tags=["Health"])
 async def healthcheck():
-    return {"status": "ok"}
+    try:
+        async with engine.connect() as connection:
+            await connection.execute(text("SELECT 1"))
+    except SQLAlchemyError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "error",
+                "database": "unavailable",
+                "message": str(exc),
+            },
+        ) from exc
+
+    return {
+        "status": "ok",
+        "database": "available",
+    }
