@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/task_manager"
     cors_allow_origins: str = "*"
     cors_allow_credentials: bool = True
     cors_allow_methods: str = "*"
