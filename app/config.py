@@ -2,15 +2,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/task_manager"
-    cors_allow_origins: str = "*"
-    cors_allow_credentials: bool = True
-    cors_allow_methods: str = "*"
-    cors_allow_headers: str = "*"
+    database_url: str
+    cors_allow_origins: str
+    cors_allow_credentials: bool
+    cors_allow_methods: str
+    cors_allow_headers: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
+        extra="ignore",
     )
 
     @staticmethod
