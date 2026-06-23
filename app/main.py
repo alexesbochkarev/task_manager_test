@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.api.router import api_router
 from app.config import settings
 from app.db.session import engine
 
@@ -20,6 +21,8 @@ app.add_middleware(
     allow_methods=settings.parsed_cors_allow_methods,
     allow_headers=settings.parsed_cors_allow_headers,
 )
+
+app.include_router(api_router)
 
 
 @app.get("/health", tags=["Health"])
