@@ -27,11 +27,21 @@ async def create_task(
     await session.commit()
     await session.refresh(task)
 
+    try:
+        await publish_task(task.id)
+    except Exception as exc:
+        task.status = TaskStatus.FAILED
+        task.error_message = "Failed to publish task to queue"
+        await session.commit()
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Task queue is unavailable",
+        ) from exc
+
     task.status = TaskStatus.PENDING
+    task.error_message = None
     await session.commit()
     await session.refresh(task)
-
-    await publish_task(task.id)
     return task
 
 
