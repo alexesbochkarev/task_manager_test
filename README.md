@@ -14,6 +14,12 @@ cp .env.example .env
 docker compose -f docker-compose.local.yml up --build
 ```
 
+Будут запущены сервисы:
+- `backend`
+- `db`
+- `rabbitmq`
+- `worker`
+
 3. Применить миграции:
 
 ```bash
@@ -24,4 +30,31 @@ docker compose -f docker-compose.local.yml exec backend alembic upgrade head
 
 ```bash
 curl http://localhost:8000/health
+```
+
+## Проверка задач
+
+Создать задачу:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Test task", "description": "Run async processing", "priority": "HIGH"}'
+```
+
+Проверить список задач:
+
+```bash
+curl http://localhost:8000/api/v1/tasks
+```
+
+После создания задача должна пройти путь:
+- `PENDING`
+- `IN_PROGRESS`
+- `COMPLETED`
+
+RabbitMQ management доступен по адресу:
+
+```text
+http://localhost:15672
 ```
