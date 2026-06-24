@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import func, select
@@ -94,7 +95,18 @@ async def cancel_task(
     if task is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
 
+    if task.status == TaskStatus.CANCELLED:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    if task.status in {TaskStatus.COMPLETED, TaskStatus.FAILED}:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Task cannot be cancelled in its current status",
+        )
+
     task.status = TaskStatus.CANCELLED
+    task.completed_at = datetime.now(timezone.utc)
+    task.error_message = "Task was cancelled by user"
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
