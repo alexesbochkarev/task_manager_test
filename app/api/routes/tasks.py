@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_async_session
 from app.models.task import Task, TaskStatus
 from app.schemas.task import TaskCreate, TaskListResponse, TaskResponse, TaskStatusResponse
+from app.services.task_queue import publish_task
 
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
@@ -25,6 +26,12 @@ async def create_task(
     session.add(task)
     await session.commit()
     await session.refresh(task)
+
+    task.status = TaskStatus.PENDING
+    await session.commit()
+    await session.refresh(task)
+
+    await publish_task(task.id)
     return task
 
 

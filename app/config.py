@@ -3,6 +3,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     database_url: str
+    rabbitmq_url: str
+    task_queue_name: str
     cors_allow_origins: str
     cors_allow_credentials: bool
     cors_allow_methods: str
