@@ -32,6 +32,20 @@ docker compose -f docker-compose.local.yml exec backend alembic upgrade head
 curl http://localhost:8000/health
 ```
 
+## Тесты
+
+Установить зависимости:
+
+```bash
+pip install -r requirements.txt
+```
+
+Запустить тесты:
+
+```bash
+python -m pytest tests -q
+```
+
 ## Проверка задач
 
 Создать задачу:
